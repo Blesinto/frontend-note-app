@@ -48,7 +48,7 @@ const Home = () => {
         setAllNotes(response.data.notes);
       }
     } catch (error) {
-      console.log('An expected error occurred');
+      console.log('An expected error occurred',error);
     }
   };
 

@@ -1,2 +1,2 @@
 // export const BASE_URL="http://localhost:8000"
-export const BASE_URL = 'https://note-app-n7o6.onrender.com';
+export const BASE_URL = import.meta.env.VITE_API_URL
