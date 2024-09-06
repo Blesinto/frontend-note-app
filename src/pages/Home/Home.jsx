@@ -16,9 +16,11 @@ const Home = () => {
 
   const [userinfo, setUserinfo] = useState(null);
   const [allNotes, setAllNotes] = useState([]);
+  const [isSearch, setisSearch] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleEdit = (noteDetails) => {
+  const handleEdit = noteDetails => {
     setOpenAddEditModal({ isShown: true, data: noteDetails, type: 'edit' });
   };
 
@@ -35,7 +37,20 @@ const Home = () => {
       }
     }
   };
-
+  // search note
+  const onsearchNote = async query => {
+    try {
+      const response = await axiosinstance.get('/search-note', {
+        params: { query },
+      });
+      if (response.data && response.data.notes) {
+        setisSearch(true);
+        setAllNotes(response.data.notes);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
     getAllNotes();
     getUserInfo();
@@ -48,11 +63,11 @@ const Home = () => {
         setAllNotes(response.data.notes);
       }
     } catch (error) {
-      console.log('An expected error occurred',error);
+      console.log('An expected error occurred', error);
     }
   };
 
-  const deleteNote = async (data) => {
+  const deleteNote = async data => {
     const noteId = data._id;
     try {
       const response = await axiosinstance.delete('/delete-note/' + noteId);
@@ -74,6 +89,7 @@ const Home = () => {
     <div className='relative min-h-screen'>
       <Navbar
         userinfo={userinfo}
+        onsearchNote={onsearchNote}
         showAdminButton={false}
         className='fixed top-0 left-0 right-0 z-10'
       />
@@ -81,7 +97,7 @@ const Home = () => {
       <div className='pt-16'>
         <div className='container mx-auto px-2 md:px-8'>
           <div className='grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-3'>
-            {allNotes.map((item) => (
+            {allNotes.map(item => (
               <Notecard
                 key={item._id}
                 title={item.title}
@@ -126,7 +142,6 @@ const Home = () => {
             top: '10%',
             overflow: 'auto', // Allow scrolling if needed
             boxSizing: 'border-box',
-           
           },
         }}
         contentLabel='Add/Edit Note'
