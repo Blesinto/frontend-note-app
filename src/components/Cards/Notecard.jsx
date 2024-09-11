@@ -1,4 +1,4 @@
-import { MdCreate, MdDelete, MdOutlinePushPin } from 'react-icons/md';
+import { MdCreate, MdDelete, } from 'react-icons/md';
 import moment from 'moment';
 
 const Notecard = ({
@@ -6,7 +6,7 @@ const Notecard = ({
   date,
   content,
   tags,
-  isPinned,
+
   onEdit,
   onDelete,
   onpinNote,
@@ -23,10 +23,7 @@ const Notecard = ({
             </span>
           </div>
 
-          <MdOutlinePushPin
-            className={`${isPinned ? 'text-primary' : 'text-slate-300'}`}
-            onClick={onpinNote}
-          />
+      
         </div>
         <p>{content.slice(0, 60)}</p>
 

@@ -72,13 +72,13 @@ const Login = () => {
               Login
             </button>
             <p className='text-sm text-center mt-4'>
-              {/* <Link
+              <Link
                 to='/signup'
                 className='font-medium
               text-gray-800  '
               >
                 ADD ADMIN
-              </Link> */}
+              </Link>
             </p>
           </form>
         </div>

@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../sidebar/Sidebar';
 import axiosinstance from '../../utils/axiosinstance';
-import { MdMenu, MdClose, MdArrowForward } from 'react-icons/md';
+import { MdMenu,MdArrowForward } from 'react-icons/md';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai'; // Import loading spinner
 
 const Layout = () => {

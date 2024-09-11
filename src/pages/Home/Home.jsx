@@ -1,10 +1,11 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MdAdd } from 'react-icons/md';
+import Modal from 'react-modal';
+
 import Notecard from '../../components/Cards/Notecard';
 import Navbar from '../../components/Navbar/Navbar';
-import { MdAdd } from 'react-icons/md';
 import AddEditNotes from './AddEditNotes';
-import { useEffect, useState } from 'react';
-import Modal from 'react-modal';
-import { useNavigate } from 'react-router-dom';
 import axiosinstance from '../../utils/axiosinstance';
 
 const Home = () => {
@@ -13,10 +14,9 @@ const Home = () => {
     type: 'add',
     data: null,
   });
-
   const [userinfo, setUserinfo] = useState(null);
   const [allNotes, setAllNotes] = useState([]);
-  const [isSearch, setisSearch] = useState(false);
+  // const [isSearch, setIsSearch] = useState(false);
 
   const navigate = useNavigate();
 
@@ -27,30 +27,40 @@ const Home = () => {
   const getUserInfo = async () => {
     try {
       const response = await axiosinstance.get('/get-user');
-      if (response.data && response.data.user) {
+      if (response.data?.user) {
         setUserinfo(response.data.user);
       }
     } catch (error) {
-      if (error.response && error.response.status === 401) {
+      if (error.response?.status === 401) {
         localStorage.clear();
-        navigate('/login');
+        navigate('/');
       }
     }
   };
-  // search note
-  const onsearchNote = async query => {
+
+  // Function to handle search query
+  const onSearchNote = async query => {
+    console.log(`Searching for: ${query}`);
+    if (!query) {
+      // If query is empty, reset to show all notes
+      setIsSearch(false);
+      getAllNotes();
+      return;
+    }
+
     try {
       const response = await axiosinstance.get('/search-note', {
         params: { query },
       });
-      if (response.data && response.data.notes) {
-        setisSearch(true);
-        setAllNotes(response.data.notes);
+      if (response.data?.data) {
+        setIsSearch(true);
+        setAllNotes(response.data.data); // Update notes with search results
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
+
   useEffect(() => {
     getAllNotes();
     getUserInfo();
@@ -59,29 +69,22 @@ const Home = () => {
   const getAllNotes = async () => {
     try {
       const response = await axiosinstance.get('/get-all-notes');
-      if (response.data && response.data.notes) {
+      if (response.data?.notes) {
         setAllNotes(response.data.notes);
       }
     } catch (error) {
-      console.log('An expected error occurred', error);
+      console.error('An unexpected error occurred', error);
     }
   };
 
-  const deleteNote = async data => {
-    const noteId = data._id;
+  const deleteNote = async note => {
     try {
-      const response = await axiosinstance.delete('/delete-note/' + noteId);
+      const response = await axiosinstance.delete(`/delete-note/${note._id}`);
       if (response.data && !response.data.error) {
         getAllNotes();
       }
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        console.log('An unexpected error occurred');
-      }
+      console.error('An unexpected error occurred', error);
     }
   };
 
@@ -89,7 +92,7 @@ const Home = () => {
     <div className='relative min-h-screen'>
       <Navbar
         userinfo={userinfo}
-        onsearchNote={onsearchNote}
+        onSearchNote={onSearchNote}
         showAdminButton={false}
         className='fixed top-0 left-0 right-0 z-10'
       />
@@ -104,10 +107,8 @@ const Home = () => {
                 date={item.createdOn}
                 content={item.content}
                 tags={item.tags}
-                isPinned={item.isPinned}
                 onEdit={() => handleEdit(item)}
                 onDelete={() => deleteNote(item)}
-                onpinNote={() => {}}
               />
             ))}
           </div>
@@ -129,18 +130,15 @@ const Home = () => {
           setOpenAddEditModal({ isShown: false, type: 'add', data: null })
         }
         style={{
-          overlay: {
-            backgroundColor: 'rgba(0,0,0,0.2)', // Ensure valid property
-          },
+          overlay: { backgroundColor: 'rgba(0,0,0,0.2)' },
           content: {
             borderRadius: '8px',
-            width: '600', // Responsive width
-            maxWidth: '500px', // Maximum width
+            maxWidth: '500px',
             margin: '0 auto',
             padding: '20px',
             position: 'relative',
             top: '10%',
-            overflow: 'auto', // Allow scrolling if needed
+            overflow: 'auto',
             boxSizing: 'border-box',
           },
         }}

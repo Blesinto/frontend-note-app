@@ -9,7 +9,7 @@ const LandingPage = () => (
     </div>
 
     {/* Main Content */}
-    <div className="flex flex-1 pt-[4rem] overflow-hidden">
+    <div className="flex flex-1 pt-[4rem] overflow-auto">
       <div className="flex-1 overflow-y-auto">
         <Layout />
       </div>

@@ -15,7 +15,7 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
     }
   }, [noteData]);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = e => {
     setFile(e.target.files[0]);
   };
 
@@ -51,11 +51,15 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
       if (file) {
         const formData = new FormData();
         formData.append('file', file);
-        const uploadResponse = await axiosinstance.post('/add-notes', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const uploadResponse = await axiosinstance.post(
+          '/add-notes',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
         newFileUrl = uploadResponse.data.fileUrl || '';
       }
 
