@@ -1,13 +1,25 @@
-import { FaHome, FaUser, FaCog, FaComments,FaChartLine } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import {
+  FaHome,
+  FaUser,
+  FaChartBar,
+  FaQuestionCircle,
+  FaSignOutAlt,
+} from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 
-const Sidebar = () => {
+const Sidebar = ({ isLoggedIn }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.clear(); // Clear all other stored data
+    navigate('/'); // Redirect to the landing page after logout
+  };
+
   const menuItems = [
     { name: 'Home', icon: <FaHome />, path: '/' },
     { name: 'Profile', icon: <FaUser />, path: '/profile' },
-    { name: 'Chat', icon: <FaComments />, path: '/chat' },
-    { name: 'Analytics', icon: <FaChartLine />, path: '/analytics' }, 
-    { name: 'Settings', icon: <FaCog />, path: '/settings' },
+    { name: 'Quiz', icon: <FaQuestionCircle />, path: '/quiz' },
+    { name: 'Result', icon: <FaChartBar />, path: '/result' },
   ];
 
   return (
@@ -15,11 +27,11 @@ const Sidebar = () => {
       <div>
         <h2 className='text-xl font-bold mb-6'>Dashboard</h2>
         <ul>
-          {menuItems.map((item) => (
+          {menuItems.map(item => (
             <li key={item.name} className='flex items-center mb-4'>
               <Link
                 to={item.path}
-                className='flex items-center text-white hover:text-gray-400 transition-colors cursor-pointer'
+                className='flex items-center text-white hover:text-gray-400 transition-colors'
               >
                 <span className='mr-3'>{item.icon}</span>
                 <span>{item.name}</span>
@@ -29,11 +41,21 @@ const Sidebar = () => {
         </ul>
       </div>
       <div className='mt-6'>
-        <button className='px-4 py-2 bg-gray-700 text-white rounded'>
-          <Link to='/login' className='text-sm font-medium'>
-            ADMIN LOGIN
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout}
+            className='px-4 py-2 bg-gray-700 text-white rounded flex items-center justify-center'
+          >
+            <FaSignOutAlt />
+          </button>
+        ) : (
+          <Link
+            to='/admin-login'
+            className='px-4 py-2 bg-gray-700 text-white rounded flex items-center justify-center'
+          >
+            <FaSignOutAlt />
           </Link>
-        </button>
+        )}
       </div>
     </div>
   );

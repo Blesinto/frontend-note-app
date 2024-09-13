@@ -2,10 +2,10 @@ import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../sidebar/Sidebar';
 import axiosinstance from '../../utils/axiosinstance';
-import { MdMenu,MdArrowForward } from 'react-icons/md';
+import { MdMenu, MdArrowForward } from 'react-icons/md';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai'; // Import loading spinner
 
-const Layout = () => {
+const Layout = ({ isLoggedIn }) => {
   const [notes, setNotes] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // State for handling loading animation
@@ -67,7 +67,7 @@ const Layout = () => {
         } transition-transform duration-300 ease-in-out md:relative md:translate-x-0`}
       >
         {/*  sidebar */}
-        <Sidebar />
+        <Sidebar isLoggedIn={isLoggedIn} />
       </div>
 
       {/* Main Content */}

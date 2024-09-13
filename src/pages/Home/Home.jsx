@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdAdd } from 'react-icons/md';
 import Modal from 'react-modal';
-
 import Notecard from '../../components/Cards/Notecard';
 import Navbar from '../../components/Navbar/Navbar';
 import AddEditNotes from './AddEditNotes';
@@ -16,7 +15,6 @@ const Home = () => {
   });
   const [userinfo, setUserinfo] = useState(null);
   const [allNotes, setAllNotes] = useState([]);
-  // const [isSearch, setIsSearch] = useState(false);
 
   const navigate = useNavigate();
 
@@ -24,26 +22,13 @@ const Home = () => {
     setOpenAddEditModal({ isShown: true, data: noteDetails, type: 'edit' });
   };
 
-  const getUserInfo = async () => {
-    try {
-      const response = await axiosinstance.get('/get-user');
-      if (response.data?.user) {
-        setUserinfo(response.data.user);
-      }
-    } catch (error) {
-      if (error.response?.status === 401) {
-        localStorage.clear();
-        navigate('/');
-      }
-    }
+  const handleLogout = () => {
+    localStorage.clear(); // Clear user session data
+    navigate('/'); // Redirect to landing page
   };
 
-  // Function to handle search query
   const onSearchNote = async query => {
-    console.log(`Searching for: ${query}`);
     if (!query) {
-      // If query is empty, reset to show all notes
-      setIsSearch(false);
       getAllNotes();
       return;
     }
@@ -53,8 +38,7 @@ const Home = () => {
         params: { query },
       });
       if (response.data?.data) {
-        setIsSearch(true);
-        setAllNotes(response.data.data); // Update notes with search results
+        setAllNotes(response.data.data);
       }
     } catch (error) {
       console.error(error);
@@ -63,7 +47,6 @@ const Home = () => {
 
   useEffect(() => {
     getAllNotes();
-    getUserInfo();
   }, []);
 
   const getAllNotes = async () => {
@@ -89,17 +72,17 @@ const Home = () => {
   };
 
   return (
-    <div className='relative min-h-screen'>
+    <div className="relative min-h-screen">
       <Navbar
         userinfo={userinfo}
         onSearchNote={onSearchNote}
         showAdminButton={false}
-        className='fixed top-0 left-0 right-0 z-10'
+        className="fixed top-0 left-0 right-0 z-10"
       />
 
-      <div className='pt-16'>
-        <div className='container mx-auto px-2 md:px-8'>
-          <div className='grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-3'>
+      <div className="pt-16 pb-20"> {/* Adjust for logout button space */}
+        <div className="container mx-auto px-2 md:px-8">
+          <div className="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-3">
             {allNotes.map(item => (
               <Notecard
                 key={item._id}
@@ -116,7 +99,7 @@ const Home = () => {
       </div>
 
       <button
-        className='w-12 h-12 flex items-center justify-center rounded-full bg-gray-800 text-white text-xl font-bold fixed right-4 bottom-4 md:right-8 md:bottom-8 lg:right-10 lg:bottom-10 z-20'
+        className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-800 text-white text-xl font-bold fixed right-4 bottom-4 md:right-8 md:bottom-8 lg:right-10 lg:bottom-10 z-20"
         onClick={() =>
           setOpenAddEditModal({ isShown: true, type: 'add', data: null })
         }
@@ -142,7 +125,7 @@ const Home = () => {
             boxSizing: 'border-box',
           },
         }}
-        contentLabel='Add/Edit Note'
+        contentLabel="Add/Edit Note"
       >
         <AddEditNotes
           type={openAddEditModal.type}
@@ -153,6 +136,16 @@ const Home = () => {
           getAllNotes={getAllNotes}
         />
       </Modal>
+
+      {/* Footer section with logout link */}
+      <div className="fixed bottom-0 left-0 w-full bg-gray-800 text-white py-4 text-center">
+        <button
+          onClick={handleLogout}
+          className="text-sm font-medium bg-transparent border-none cursor-pointer hover:underline"
+        >
+          LOGOUT
+        </button>
+      </div>
     </div>
   );
 };

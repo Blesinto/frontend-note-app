@@ -11,7 +11,7 @@ const Navbar = ({ userinfo, onSearchNote }) => {
   // Logout function to clear storage and navigate to the landing page
   const onLogout = () => {
     localStorage.clear();
-    navigate('/');
+    navigate('/'); // Redirect to landing page after logout
   };
 
   // Handle search logic
@@ -43,7 +43,7 @@ const Navbar = ({ userinfo, onSearchNote }) => {
         onClearSearch={onClearSearch}
       />
 
-      <ProfileInfo userinfo={userinfo} onLogout={onLogout} />
+      <ProfileInfo userinfo={userinfo} onLogout={onLogout} /> {/* Pass userinfo here */}
     </div>
   );
 };
