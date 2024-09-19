@@ -7,10 +7,10 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
   const [content, setContent] = useState(noteData?.content || '');
   const [error, setError] = useState(null);
   const [file, setFile] = useState(null);
-  const [fileUrl, setFileUrl] = useState(noteData?.fileUrl || ''); // Initialize with existing file URL
+  const [fileUrl, setFileUrl] = useState(noteData?.fileUrl || '');
 
   useEffect(() => {
-    if (noteData?.fileUrl) {
+    if (noteData.fileUrl) {
       setFileUrl(noteData.fileUrl);
     }
   }, [noteData]);
@@ -26,8 +26,10 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
     formData.append('content', content);
 
     try {
+      const token = localStorage.getItem('accessToken');
       const response = await axiosinstance.post('/add-notes', formData, {
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
@@ -38,46 +40,39 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
         setError(response.data.message);
       }
     } catch (error) {
-      console.error('Error adding note:', error);
+      console.error(
+        'Error adding note:',
+        error.response ? error.response.data : error.message
+      );
       setError('Failed to add note');
     }
   };
 
   const editNote = async () => {
     const noteId = noteData._id;
+
     let newFileUrl = fileUrl;
 
     try {
-      if (file) {
-        const formData = new FormData();
-        formData.append('file', file);
-        const uploadResponse = await axiosinstance.post(
-          '/add-notes',
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
-        newFileUrl = uploadResponse.data.fileUrl || '';
-      }
-
-      const response = await axiosinstance.put(`/edit-note/${noteId}`, {
+      const response = await axiosinstance.put('/edit-note/' + noteId, {
         title,
         content,
-        fileUrl: newFileUrl,
+        fileUrl: newFileUrl, // Ensure the fileUrl is included only if there’s a new URL
       });
+    
 
-      if (response.data && !response.data.error) {
+      if (response.data && response.data.error) {
         getAllNotes();
         onClose();
-      } else {
-        setError(response.data.message);
       }
     } catch (error) {
-      console.error('Error editing note:', error);
-      setError('Failed to edit note');
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      }
     }
   };
 

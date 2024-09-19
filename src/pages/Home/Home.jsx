@@ -45,9 +45,10 @@ const Home = () => {
     }
   };
 
+
   useEffect(() => {
     getAllNotes();
-  }, []);
+  }, [ ]);
 
   const getAllNotes = async () => {
     try {
@@ -59,30 +60,68 @@ const Home = () => {
       console.error('An unexpected error occurred', error);
     }
   };
+  // delete note
+  const deleteNote = async data => {
+    const noteId = data._id;
 
-  const deleteNote = async note => {
     try {
-      const response = await axiosinstance.delete(`/delete-note/${note._id}`);
+      // Retrieve token from localStorage or state (ensure this is correct in your app)
+      const token = localStorage.getItem('accessToken');
+      console.log(token);
+      if (!token) {
+        console.error('No access token found');
+        return;
+      }
+
+      console.log(noteId);
+
+      // const response = await axiosinstance.delete(`/delete-note/${noteId}`, {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`, // Attach token to the request
+      //   },
+      //   withCredentials: true,
+      // });
+
+      const response = await axiosinstance.delete(`/delete-note/${noteId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (response.data && !response.data.error) {
-        getAllNotes();
+        console.log('Note deleted successfully');
+        getAllNotes(); // Refresh the list of notes after deletion
+      } else {
+        console.log('Error:', response.data.message);
       }
     } catch (error) {
-      console.error('An unexpected error occurred', error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        console.error(error.response);
+        console.error('Error:', error.response.data.message);
+      } else {
+        console.error('An unexpected error occurred', error);
+      }
     }
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className='relative min-h-screen'>
       <Navbar
         userinfo={userinfo}
         onSearchNote={onSearchNote}
         showAdminButton={false}
-        className="fixed top-0 left-0 right-0 z-10"
+        className='fixed top-0 left-0 right-0 z-10'
       />
 
-      <div className="pt-16 pb-20"> {/* Adjust for logout button space */}
-        <div className="container mx-auto px-2 md:px-8">
-          <div className="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className='pt-16 pb-20'>
+        {' '}
+        {/* Adjust for logout button space */}
+        <div className='container mx-auto px-2 md:px-8'>
+          <div className='grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-3'>
             {allNotes.map(item => (
               <Notecard
                 key={item._id}
@@ -99,7 +138,7 @@ const Home = () => {
       </div>
 
       <button
-        className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-800 text-white text-xl font-bold fixed right-4 bottom-4 md:right-8 md:bottom-8 lg:right-10 lg:bottom-10 z-20"
+        className='w-12 h-12 flex items-center justify-center rounded-full bg-gray-800 text-white text-xl font-bold fixed right-4 bottom-4 md:right-8 md:bottom-8 lg:right-10 lg:bottom-10 z-20'
         onClick={() =>
           setOpenAddEditModal({ isShown: true, type: 'add', data: null })
         }
@@ -125,7 +164,7 @@ const Home = () => {
             boxSizing: 'border-box',
           },
         }}
-        contentLabel="Add/Edit Note"
+        contentLabel='Add/Edit Note'
       >
         <AddEditNotes
           type={openAddEditModal.type}
@@ -138,10 +177,10 @@ const Home = () => {
       </Modal>
 
       {/* Footer section with logout link */}
-      <div className="fixed bottom-0 left-0 w-full bg-gray-800 text-white py-4 text-center">
+      <div className='fixed bottom-0 left-0 w-full bg-gray-800 text-white py-4 text-center'>
         <button
           onClick={handleLogout}
-          className="text-sm font-medium bg-transparent border-none cursor-pointer hover:underline"
+          className='text-sm font-medium bg-transparent border-none cursor-pointer hover:underline'
         >
           LOGOUT
         </button>

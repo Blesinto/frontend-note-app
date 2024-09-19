@@ -2,21 +2,22 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosinstance from '../../utils/axiosinstance';
 import { MdArrowBack } from 'react-icons/md';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai'; // Import loading spinner
+// import { AiOutlineLoading3Quarters } from 'react-icons/ai'; // Import loading spinner
 import { MdFileDownload } from 'react-icons/md'; // Import download icon
 
 const NoteDetail = () => {
   const { id } = useParams();
   const [note, setNote] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
   useEffect(() => {
     const fetchNote = async () => {
       try {
         const { data } = await axiosinstance.get(`/get-all-notes/${id}`);
         if (data?.note) {
           setNote(data.note);
+        } else {
+          console.error('Note not found');
         }
       } catch (error) {
         console.error('Error fetching note:', error);
@@ -28,16 +29,21 @@ const NoteDetail = () => {
     fetchNote();
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className='relative min-h-screen flex items-center justify-center'>
-        <AiOutlineLoading3Quarters className='text-gray-600 text-6xl animate-spin' />
-      </div>
-    ); // Display a spinner while loading
-  }
+  // if (loading) {
+  //   return (
+  //     <div className='relative min-h-screen flex items-center justify-center'>
+  //       <AiOutlineLoading3Quarters className='text-gray-600 text-6xl animate-spin' />
+  //     </div>
+  //   ); // Display a spinner while loading
+  // }
 
+  
   if (!note) {
-    return <div className='min-h-screen flex items-center justify-center text-gray-700'>Note not found</div>;
+    return (
+      <div className='min-h-screen flex items-center justify-center text-gray-700'>
+        Note not found
+      </div>
+    );
   }
 
   return (
@@ -65,7 +71,7 @@ const NoteDetail = () => {
           <div className='mt-6 flex justify-center'>
             <a
               href={note.fileUrl}
-                  target='_blank'
+              target='_blank'
               className='bg-gray-800 text-white px-4 py-2 rounded-lg shadow transition-colors duration-300 text-sm flex items-center'
               download
             >

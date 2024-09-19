@@ -35,12 +35,14 @@ const Login = () => {
 
       // If login is successful, store the token and role in localStorage
       if (response.data && response.data.role) {
+        console.log(response.data.role);
         // Store role in localStorage
+        localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('role', response.data.role);
 
         // Check role and navigate accordingly
         if (response.data.role === 'admin') {
-          console.log(response.data.role);
+          console.log(response.data);
           // window.location.pathname = '/admin-dashboard';
           navigate('/admin-dashboard');
         } else if (response.data.role === 'student') {

@@ -103,14 +103,14 @@ const Signup = () => {
               onChange={e => setPassword(e.target.value)}
             />
             {/* Role Selection */}
-            <select
+            {/* <select
               value={registrationType}
               onChange={e => setRegistrationType(e.target.value)}
               className='input-box'
             >
               <option value='student'>Student</option>
               <option value='admin'>Admin</option>
-            </select>
+            </select> */}
 
             {/* Display success message if any */}
             {successMessage && (

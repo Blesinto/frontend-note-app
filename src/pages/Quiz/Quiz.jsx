@@ -228,7 +228,7 @@ const Quiz = () => {
           </p>
           <button
             onClick={handleStartQuiz}
-            className='bg-green-500 text-white py-3 px-8 rounded-lg font-semibold hover:bg-green-600 transition-all'
+            className='bg-gray-800 text-white py-3 px-8 rounded-lg font-semibold  transition-all'
           >
             Start Quiz
           </button>
