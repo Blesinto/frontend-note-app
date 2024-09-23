@@ -5,7 +5,6 @@ import { useState } from 'react';
 
 const Navbar = ({ userinfo, onSearchNote }) => {
   const [searchQuery, setSearchQuery] = useState('');
-
   const navigate = useNavigate();
 
   // Logout function to clear storage and navigate to the landing page
@@ -33,17 +32,19 @@ const Navbar = ({ userinfo, onSearchNote }) => {
   };
 
   return (
-    <div className='fixed top-0 left-0 right-0 bg-white flex items-center justify-between px-6 py-2 drop-shadow z-50'>
-      <h2 className='text-xl font-medium text-black'>NOTES-APP</h2>
+    <div className='fixed top-0 left-0 right-0 bg-white flex items-center justify-between px-4 md:px-6 py-2 drop-shadow z-50'>
+      <h2 className='text-lg md:text-xl font-medium text-black'>NOTES-APP</h2>
 
-      <SearchBar
-        value={searchQuery}
-        onChange={event => setSearchQuery(event.target.value)}
-        handleSearch={handleSearch}
-        onClearSearch={onClearSearch}
-      />
+      <div className='flex-grow mx-2 md:mx-4'>
+        <SearchBar
+          value={searchQuery}
+          onChange={event => setSearchQuery(event.target.value)}
+          handleSearch={handleSearch}
+          onClearSearch={onClearSearch}
+        />
+      </div>
 
-      <ProfileInfo userinfo={userinfo} onLogout={onLogout} /> {/* Pass userinfo here */}
+      <ProfileInfo userinfo={userinfo} onLogout={onLogout} />
     </div>
   );
 };

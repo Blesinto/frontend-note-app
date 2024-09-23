@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { MdAdd } from 'react-icons/md';
 import Modal from 'react-modal';
 import Notecard from '../../components/Cards/Notecard';
@@ -8,28 +7,24 @@ import AddEditNotes from './AddEditNotes';
 import axiosinstance from '../../utils/axiosinstance';
 
 const Home = () => {
+  // State for managing the modal visibility and type
   const [openAddEditModal, setOpenAddEditModal] = useState({
     isShown: false,
     type: 'add',
     data: null,
   });
-  const [userinfo, setUserinfo] = useState(null);
+  // State to hold all notes
   const [allNotes, setAllNotes] = useState([]);
 
-  const navigate = useNavigate();
-
+  // Function to open the edit modal with note details
   const handleEdit = noteDetails => {
     setOpenAddEditModal({ isShown: true, data: noteDetails, type: 'edit' });
   };
 
-  const handleLogout = () => {
-    localStorage.clear(); // Clear user session data
-    navigate('/'); // Redirect to landing page
-  };
-
+  // Function to search notes based on a query
   const onSearchNote = async query => {
     if (!query) {
-      getAllNotes();
+      getAllNotes(); // If no query, fetch all notes
       return;
     }
 
@@ -38,88 +33,70 @@ const Home = () => {
         params: { query },
       });
       if (response.data?.data) {
-        setAllNotes(response.data.data);
+        setAllNotes(response.data.data); // Update notes with search results
       }
     } catch (error) {
-      console.error(error);
+      console.error(error); // Log any errors
     }
   };
 
-
+  // Fetch all notes on component mount
   useEffect(() => {
     getAllNotes();
-  }, [ ]);
+  }, []);
 
+  // Function to fetch all notes from the API
   const getAllNotes = async () => {
     try {
       const response = await axiosinstance.get('/get-all-notes');
       if (response.data?.notes) {
-        setAllNotes(response.data.notes);
+        setAllNotes(response.data.notes); // Set notes from response
       }
     } catch (error) {
-      console.error('An unexpected error occurred', error);
+      console.error('An unexpected error occurred', error); // Log errors
     }
   };
-  // delete note
+
+  // Function to delete a note
   const deleteNote = async data => {
     const noteId = data._id;
 
     try {
-      // Retrieve token from localStorage or state (ensure this is correct in your app)
       const token = localStorage.getItem('accessToken');
-      console.log(token);
       if (!token) {
         console.error('No access token found');
-        return;
+        return; // Exit if no token is found
       }
 
-      console.log(noteId);
-
-      // const response = await axiosinstance.delete(`/delete-note/${noteId}`, {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`, // Attach token to the request
-      //   },
-      //   withCredentials: true,
-      // });
-
       const response = await axiosinstance.delete(`/delete-note/${noteId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
+
+      // Update notes state to remove the deleted note
+      setAllNotes(allNotes.filter(note => note._id !== noteId));
 
       if (response.data && !response.data.error) {
         console.log('Note deleted successfully');
-        getAllNotes(); // Refresh the list of notes after deletion
       } else {
         console.log('Error:', response.data.message);
       }
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        console.error(error.response);
-        console.error('Error:', error.response.data.message);
-      } else {
-        console.error('An unexpected error occurred', error);
-      }
+      console.error(
+        'An unexpected error occurred',
+        error.response?.data?.message || error // Log specific error messages
+      );
     }
   };
 
   return (
     <div className='relative min-h-screen'>
+      {/* Navbar with search functionality */}
       <Navbar
-        userinfo={userinfo}
-        onSearchNote={onSearchNote}
-        showAdminButton={false}
+        // onSearchNote={onSearchNote}
         className='fixed top-0 left-0 right-0 z-10'
       />
 
       <div className='pt-16 pb-20'>
-        {' '}
-        {/* Adjust for logout button space */}
         <div className='container mx-auto px-2 md:px-8'>
           <div className='grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-3'>
             {allNotes.map(item => (
@@ -137,6 +114,7 @@ const Home = () => {
         </div>
       </div>
 
+      {/* Button to open the add note modal */}
       <button
         className='w-12 h-12 flex items-center justify-center rounded-full bg-gray-800 text-white text-xl font-bold fixed right-4 bottom-4 md:right-8 md:bottom-8 lg:right-10 lg:bottom-10 z-20'
         onClick={() =>
@@ -146,20 +124,22 @@ const Home = () => {
         <MdAdd />
       </button>
 
+      {/* Modal for adding/editing notes */}
       <Modal
         isOpen={openAddEditModal.isShown}
         onRequestClose={() =>
           setOpenAddEditModal({ isShown: false, type: 'add', data: null })
         }
         style={{
-          overlay: { backgroundColor: 'rgba(0,0,0,0.2)' },
+          overlay: { backgroundColor: 'rgba(0,0,0,0.5)' },
           content: {
             borderRadius: '8px',
-            maxWidth: '500px',
+            maxWidth: '90%', // Adjust for responsiveness
+            width: '500px', // Set a max width
             margin: '0 auto',
             padding: '20px',
-            position: 'relative',
             top: '10%',
+            left: '5%',
             overflow: 'auto',
             boxSizing: 'border-box',
           },
@@ -172,19 +152,10 @@ const Home = () => {
           onClose={() =>
             setOpenAddEditModal({ isShown: false, type: 'add', data: null })
           }
-          getAllNotes={getAllNotes}
+          setAllNotes={setAllNotes}
+          allNotes={allNotes}
         />
       </Modal>
-
-      {/* Footer section with logout link */}
-      <div className='fixed bottom-0 left-0 w-full bg-gray-800 text-white py-4 text-center'>
-        <button
-          onClick={handleLogout}
-          className='text-sm font-medium bg-transparent border-none cursor-pointer hover:underline'
-        >
-          LOGOUT
-        </button>
-      </div>
     </div>
   );
 };

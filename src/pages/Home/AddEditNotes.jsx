@@ -2,7 +2,14 @@ import { useState, useEffect } from 'react';
 import { MdClose } from 'react-icons/md';
 import axiosinstance from '../../utils/axiosinstance';
 
-const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
+const AddEditNotes = ({
+  onClose,
+  noteData,
+  type,
+  allNotes,
+  setAllNotes,
+  getAllNotes,
+}) => {
   const [title, setTitle] = useState(noteData?.title || '');
   const [content, setContent] = useState(noteData?.content || '');
   const [error, setError] = useState(null);
@@ -10,7 +17,7 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
   const [fileUrl, setFileUrl] = useState(noteData?.fileUrl || '');
 
   useEffect(() => {
-    if (noteData.fileUrl) {
+    if (noteData?.fileUrl) {
       setFileUrl(noteData.fileUrl);
     }
   }, [noteData]);
@@ -33,7 +40,9 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
           'Content-Type': 'multipart/form-data',
         },
       });
+
       if (response.data && !response.data.error) {
+        setAllNotes([...allNotes, response.data.note]);
         getAllNotes();
         onClose();
       } else {
@@ -49,28 +58,39 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
   };
 
   const editNote = async () => {
-    const noteId = noteData._id;
-
-    let newFileUrl = fileUrl;
+    const noteId = noteData?._id;
 
     try {
-      const response = await axiosinstance.put('/edit-note/' + noteId, {
-        title,
-        content,
-        fileUrl: newFileUrl, // Ensure the fileUrl is included only if there’s a new URL
-      });
-    
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.error('No access token found');
+        return;
+      }
 
-      if (response.data && response.data.error) {
-        getAllNotes();
+      const response = await axiosinstance.put(
+        `/edit-note/${noteId}`,
+        {
+          title,
+          content,
+          fileUrl,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const updatedNotes = allNotes.map(note =>
+        note._id === noteId ? response.data.note : note
+      );
+      setAllNotes(updatedNotes);
+
+      if (response.data.success) {
         onClose();
       }
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
+      if (error.response?.data?.message) {
         setError(error.response.data.message);
       }
     }
@@ -85,6 +105,7 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
       setError('Please enter the content');
       return;
     }
+
     setError('');
     if (type === 'edit') {
       editNote();
@@ -94,7 +115,7 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
   };
 
   return (
-    <div className='relative p-4 md:p-6 lg:p-8 max-w-full mx-auto'>
+    <div className='relative p-4 md:p-6 lg:p-8 max-w-lg mx-auto bg-white shadow-md rounded-lg'>
       <button
         className='w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 absolute -top-4 -right-4 hover:bg-gray-300'
         onClick={onClose}
@@ -116,7 +137,6 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
         <div className='flex flex-col mt-4'>
           <label className='text-sm font-semibold mb-1'>CONTENT</label>
           <textarea
-            type='text'
             className='text-sm p-2 border border-gray-300 rounded-md bg-gray-50 outline-none focus:border-blue-500'
             placeholder='Enter the content'
             rows={6}
@@ -152,7 +172,10 @@ const AddEditNotes = ({ onClose, noteData, type, getAllNotes }) => {
         {error && <p className='text-red-500 text-sm mt-2'>{error}</p>}
         <button
           className='bg-gray-800 text-white font-medium mt-4 py-2 px-4 rounded-md hover:bg-gray-700'
-          onClick={handleAddNote}
+          onClick={() => {
+            handleAddNote();
+            onClose();
+          }}
         >
           {type === 'edit' ? 'UPDATE' : 'ADD'}
         </button>

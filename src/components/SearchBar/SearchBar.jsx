@@ -1,26 +1,24 @@
-import { FaMagnifyingGlass } from 'react-icons/fa6';
-import { IoMdClose } from 'react-icons/io';
+import { useNavigate } from 'react-router-dom';
+import { MdLogout } from 'react-icons/md'; // Import a logout icon
 
-const SearchBar = ({ value, onChange, handleSearch, onClearSearch }) => {
+const SearchBar = () => {
+  const navigate = useNavigate(); // Initialize the navigate function
+
+  const handleLogout = () => {
+    localStorage.clear(); // Clear all stored data
+    navigate('/'); // Redirect to the landing page after logout
+  };
+
   return (
-    <div className='w-80 flex items-center px-4 bg-slate-100 rounded-md'>
-      <input
-        type='text'
-        placeholder='Search Notes'
-        value={value}
-        onChange={onChange}  // Corrected to camel case
-        className='w-full text-xs bg-transparent py-[11px] outline-none'
-      />
-      {value && (
-        <IoMdClose
-          onClick={onClearSearch}  // Corrected to camel case
-          className='text-xl text-slate-500 cursor-pointer hover:text-black mr-3'
-        />
-      )}
-      <FaMagnifyingGlass
-        onClick={handleSearch}
-        className='text-slate cursor-pointer hover:text-black'
-      />
+    <div className='flex items-center justify-end w-full'>
+      {/* Logout Button */}
+      <button
+        onClick={handleLogout}
+        className='flex items-center px-3 py-2 bg-gray-700 text-white rounded transition-colors duration-200 hover:bg-gray-600 text-sm md:text-base lg:text-lg'
+      >
+        <MdLogout className='mr-2 text-lg' /> {/* Add the icon here */}
+        Logout
+      </button>
     </div>
   );
 };

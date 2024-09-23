@@ -41,7 +41,7 @@ const Sidebar = ({ isLoggedIn }) => {
         </ul>
       </div>
       <div className='mt-6'>
-        {isLoggedIn ? (
+        {/* {isLoggedIn ? (
           <button
             onClick={handleLogout}
             className='px-4 py-2 bg-gray-700 text-white rounded flex items-center justify-center'
@@ -55,7 +55,7 @@ const Sidebar = ({ isLoggedIn }) => {
           >
             <FaSignOutAlt />
           </Link>
-        )}
+        )} */}
       </div>
     </div>
   );
