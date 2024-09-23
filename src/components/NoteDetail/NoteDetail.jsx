@@ -41,7 +41,7 @@ const NoteDetail = () => {
   if (!note) {
     return (
       <div className='min-h-screen flex items-center justify-center text-gray-700'>
-        Note not found
+       
       </div>
     );
   }
